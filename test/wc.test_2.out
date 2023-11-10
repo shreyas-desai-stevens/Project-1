@@ -1,0 +1,2 @@
+usage: wc.py [-h] [input_file]
+wc.py: error: argument input_file: can't open 'input_files/input2.txt': [Errno 2] No such file or directory: 'input_files/input2.txt'
