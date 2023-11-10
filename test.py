@@ -9,12 +9,11 @@ test_files = [filename for filename in os.listdir(test_directory) if filename.en
 
 def run_test(program, input_file):
     input_path = os.path.join(test_directory, input_file)
-    # input_path = Path(input_path)
-    # print(Path(input_path) )
+
     expected_output_path = os.path.join(test_directory, input_file.replace(".in", ".out"))
-    # print(expected_output_path)
+
     expected_error_path = os.path.join(test_directory, input_file.replace(".in", ".err"))
-    # print(expected_error_path)
+
 
     try:
         if 'stdin' in input_path:
@@ -25,7 +24,7 @@ def run_test(program, input_file):
                 cmd = f"python prog/{program} {Path(input_path).as_posix()}"
 
         result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, text=True)
-        print(result)
+        # print(result)
         if result.stderr:
             try:
                 with open(expected_error_path, "r") as expected_error:
@@ -55,7 +54,6 @@ def run_test(program, input_file):
 def main(): 
     errors = {"PASSED":0,"FAILED":0}
     total = 0
-    print(test_files)
     for test_file in test_files:
         if test_file.startswith('wc'):
             program = "wc.py"

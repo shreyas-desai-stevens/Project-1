@@ -27,8 +27,6 @@ def main():
         file_name = args.input_file.name
         if os.name == 'nt':
             file_name = Path(args.input_file.name).as_posix()
-        # print(Path(args.input_file.name).as_posix())
-        # print(os.name)
         print(f"{lines}    {words}    {characters} {file_name if args.input_file.name!='<stdin>' else ''}", end="")
     except Exception as e:
         sys.stderr.write(str(e))

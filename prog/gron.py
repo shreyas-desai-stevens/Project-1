@@ -30,9 +30,8 @@ def main():
         result_lines = gron(json_data)
                 
     except Exception as e:
-        print(f"Error: {e}",file=sys.stderr)
+        sys.stderr.write(f"Error: {e}")
         sys.exit(1)
-        # print(e)
     
     for line in result_lines:
         print(line)
