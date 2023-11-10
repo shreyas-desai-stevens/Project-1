@@ -1,3 +1,4 @@
+import argparse
 import json
 import sys
 
@@ -20,22 +21,22 @@ def gron(json_data, parent_key='json', depth=0):
     return [f"{line}" for line in result]
 
 def main():
+    parser = argparse.ArgumentParser(description="Return a JSON file structure in a flattened way")
+    parser.add_argument("input_json", nargs='?', type=argparse.FileType("r"), default=sys.stdin, help="File to flatten JSON from (default is stdin)")
+    
+    args = parser.parse_args()
     try:
-        if len(sys.argv) == 2:
-            input_file = sys.argv[1]
-            with open(input_file, 'r') as file:
-                json_data = json.load(file)
-        else:
-            json_data = json.load(sys.stdin)
+        with args.input_json as json_file:
+            json_data = json.load(json_file)
+
         result_lines = gron(json_data)
+
+        for line in result_lines:
+            print(line)
                 
     except Exception as e:
         sys.stderr.write(f"Error: {e}")
         sys.exit(1)
-    
-    for line in result_lines:
-        print(line)
-
     
 
 if __name__ == "__main__":
