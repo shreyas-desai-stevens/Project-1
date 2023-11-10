@@ -54,6 +54,7 @@ def run_test(program, input_file):
 def main(): 
     errors = {"PASSED":0,"FAILED":0}
     total = 0
+
     for test_file in test_files:
         if test_file.startswith('wc'):
             program = "wc.py"
