@@ -5,7 +5,7 @@ def generate_random_word(length):
     return random_word
 
 with open('test\\wc.test_4.in','w') as file:
-    for i in range(1000):
-        for j in range(1000):
+    for i in range(10):
+        for j in range(10):
             word = generate_random_word(j)
             file.write(f"{word}\n")

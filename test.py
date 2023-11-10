@@ -22,14 +22,14 @@ def run_test(program, input_file):
                 cmd = f"python prog/{program} < {input_path}"
         else:
                 print(f"File: {input_path}")
-                cmd = f"python prog/{program} {input_path}"
+                cmd = f"python prog/{program} {Path(input_path).as_posix()}"
 
         result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, text=True)
+        print(result)
         if result.stderr:
             try:
                 with open(expected_error_path, "r") as expected_error:
-                    expected_result = expected_error.read()
-                    # print(expected_result)   
+                    expected_result = expected_error.read()   
                     if result.stderr.strip() == expected_result.strip():
                         return "PASS", None, 0, expected_result
                     else:
@@ -40,22 +40,19 @@ def run_test(program, input_file):
         if result.stdout and not result.stderr:        
             try:
                 with open(expected_output_path, "r") as expected_output:
-                    print("No eror")
                     expected_result = expected_output.read()
                     if result.stdout.strip() == expected_result.strip():
                         return "PASS", None, result.returncode, expected_result
                     else:
                         return "FAIL", f"Output Mismatch!\nGot:\n{result.stdout}", 1, expected_result
             except FileNotFoundError:
-                print("Error")
                 return "FAIL", f"File Not Found!\n{expected_output_path}", 1, ''
 
 
     except Exception as e:
         return "ERROR", str(e)
 
-def main():
-    programs = ["wc.py","gron.py"]  
+def main(): 
     errors = {"PASSED":0,"FAILED":0}
     total = 0
     print(test_files)

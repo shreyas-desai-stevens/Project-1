@@ -1,7 +1,7 @@
 {
-    "abc": 
+    "menu": 
     {
-        "id": 1,
+        "id": "file",
         "value": "File",
         "popup": 
         {
@@ -13,23 +13,9 @@
             ]
         }
     },
-    "ab": 
+    "menu": 
     {
-        "id": 2,
-        "value": "File",
-        "popup": 
-        {
-            "menuitem": 
-            [
-                {"value": "New", "onclick": "CreateNewDoc()"},
-                {"value": "Open", "onclick": "OpenDoc()"},
-                {"value": "Close", "onclick": "CloseDoc()"}
-            ]
-        }
-    },
-    "a": 
-    {
-        "id": 3,
+        "id": "file",
         "value": "File",
         "popup": 
         {
