@@ -19,6 +19,10 @@ def count_wc(file):
 def main():
     parser = argparse.ArgumentParser(description="Count characters, words, and lines in a file or from standard input")
     parser.add_argument("input_file", nargs='?', type=argparse.FileType("r"), default=sys.stdin, help="File to read input from (default is stdin)")
+    parser.add_argument('-w','--words',help='Display word(s) count',action='store_true')
+    parser.add_argument('-c','--chars',help='Display character(s) count',action='store_true')
+    parser.add_argument('-l','--lines',help='Display line(s) count',action='store_true')
+    
 
     args = parser.parse_args()
 
@@ -27,7 +31,13 @@ def main():
         file_name = args.input_file.name
         if os.name == 'nt':
             file_name = Path(args.input_file.name).as_posix()
-        print(f"{lines}    {words}    {characters} {file_name if args.input_file.name!='<stdin>' else ''}", end="")
+            
+        if not args.chars and not args.words and not args.chars:
+            args.chars = True
+            args.words = True
+            args.lines = True
+
+        print(f"{'    '+str(lines) if args.lines else ''}{'    '+str(words) if args.words else ''}{'    '+str(characters) if args.chars else ''} {file_name if args.input_file.name!='<stdin>' else ''}", end="")
     except Exception as e:
         sys.stderr.write(str(e))
         sys.exit(1)

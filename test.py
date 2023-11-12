@@ -17,18 +17,18 @@ def run_test(program, input_file, run_type):
     try:
         print(f"File: {input_path}")
 
-        if run_type == "stdin":
+        if run_type == "stdin" and program != 'cipher.py':
             cmd = f"python prog/{program} < {input_path}"
         else:
             cmd = f"python prog/{program} {Path(input_path).as_posix()}"
 
         result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, text=True)
-
+        print(result)
         if result.stderr:
             try:
                 with open(expected_error_path, "r") as expected_error:
                     expected_result = expected_error.read()   
-                    if result.stderr.strip() == expected_result.strip():
+                    if result.stderr == expected_result:
                         return "PASS", None, 0, expected_result
                     else:
                         return "FAIL", f"Output Mismatch!\nGot:\n{result.stdout}", 1, expected_result
@@ -39,7 +39,7 @@ def run_test(program, input_file, run_type):
             try:
                 with open(expected_output_path, "r") as expected_output:
                     expected_result = expected_output.read()
-                    if result.stdout.strip() == expected_result.strip():
+                    if result.stdout == expected_result:
                         return "PASS", None, result.returncode, expected_result
                     else:
                         return "FAIL", f"Output Mismatch!\nGot:\n{result.stdout}", 1, expected_result
@@ -58,8 +58,8 @@ def main():
             program = "wc.py"
         elif test_file.startswith('gron'):
             program = "gron.py"
-        else:
-            continue
+        elif test_file.startswith('cipher'):
+            program = "cipher.py"
 
         for run_type in ["cli", "stdin"]:
             status, error_message, exit_code, expected_result = run_test(program, test_file, run_type)
