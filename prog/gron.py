@@ -23,7 +23,6 @@ def gron(json_data, parent_key='json', depth=0):
 def main():
     parser = argparse.ArgumentParser(description="Return a JSON file structure in a flattened way")
     parser.add_argument("input_json", nargs='?', type=argparse.FileType("r"), default=sys.stdin, help="File to flatten JSON from (default is stdin)")
-    
     args = parser.parse_args()
     try:
         with args.input_json as json_file:

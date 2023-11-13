@@ -7,20 +7,21 @@ test_directory = "test"
 
 test_files = [filename for filename in os.listdir(test_directory) if filename.endswith(".in")]
 
-def run_test(program, input_file, run_type):
+def run_test(program, input_file, run_type, flags):
     input_path = os.path.join(test_directory, input_file)
-    expected_output_path = os.path.join(test_directory, input_file.replace(".in", ".out"))
+    expected_output_path = os.path.join(test_directory, input_file.replace(".in", f"{flags}.out"))
     if run_type=='stdin':
         expected_output_path = expected_output_path.replace('.out','.stdin.out')
     expected_error_path = os.path.join(test_directory, input_file.replace(".in", ".err"))
 
     try:
-        print(f"File: {input_path}")
+        print(f"File   : {input_path}")
+        print(f"Output : {expected_output_path}")
 
-        if run_type == "stdin" and program != 'cipher.py':
-            cmd = f"python prog/{program} < {input_path}"
+        if run_type == "stdin":
+            cmd = f"python prog/{program} {flags} < {input_path}"
         else:
-            cmd = f"python prog/{program} {Path(input_path).as_posix()}"
+            cmd = f"python prog/{program} {Path(input_path).as_posix()} {flags}"
 
         result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, text=True)
         print(result)
@@ -50,36 +51,54 @@ def run_test(program, input_file, run_type):
         return "ERROR", str(e)
 
 def main(): 
-    errors = {"PASSED": 0, "FAILED": 0}
+    errors = {"PASSED": 0, "FAILED": 0,"WC_Tests":0,"GRON_Tests":0,"CIPHER_Tests":0}
     total = 0
+    flags = {
+                "wc":['','-l','-w','-c'],
+                "gron":[''],
+                "cipher":['','-e','-d']
+            }   
 
     for test_file in test_files:
         if test_file.startswith('wc'):
             program = "wc.py"
+            errors["WC_Tests"]+=1
+            additional_flags = flags['wc']
         elif test_file.startswith('gron'):
             program = "gron.py"
+            errors["GRON_Tests"]+=1
+            additional_flags = flags['gron']
         elif test_file.startswith('cipher'):
             program = "cipher.py"
+            errors["CIPHER_Tests"]+=1
+            additional_flags = flags['cipher']
 
         for run_type in ["cli", "stdin"]:
-            status, error_message, exit_code, expected_result = run_test(program, test_file, run_type)
-            total += 1
+            # if additional_flags:
+            for i in additional_flags:
+                status, error_message, exit_code, expected_result = run_test(program, test_file, run_type, i)
+                total += 1
+                # if program=='wc.py':
+                #     errors["WC_Tests"]+=1
+                # if program=='gron.py':
+                #     errors["GRON_Tests"]+=1
+                # if program=='cipher.py':
+                #     errors["CIPHER_Tests"]+=1
+                if exit_code > 0:
+                    errors['FAILED'] += 1
+                else:
+                    errors['PASSED'] += 1
 
-            if exit_code > 0:
-                errors['FAILED'] += 1
-            else:
-                errors['PASSED'] += 1
+                print(f"{status} \n\tTest case: {test_file.split('.')[0]} {test_file.split('.')[1]}\n")
+                print(f"\tRun Type: {run_type.upper()}")
+                print(f"\tExit Code: {exit_code}")
 
-            print(f"{status} \n\tTest case: {test_file.split('.')[0]} {test_file.split('.')[1]}\n")
-            print(f"\tRun Type: {run_type.upper()}")
-            print(f"\tExit Code: {exit_code}")
+                if error_message:
+                    print(f"Output:\n{error_message}\n")
+                    print(f"Expected Output:\n{expected_result}\n")
+                print("-----------------------------------------------------------------")
 
-            if error_message:
-                print(f"Output:\n{error_message.strip()}\n")
-                print(f"Expected Output:\n{expected_result.strip()}\n")
-            print("-----------------------------------------------------------------")
-
-    print("-----------------------------------------------------------------")
+        print("-----------------------------------------------------------------")
     for i, j in errors.items():
         print(f"{i} : {j}")
     print(f"TOTAL  : {total}")

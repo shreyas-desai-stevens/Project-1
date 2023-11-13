@@ -5,6 +5,7 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 import os
 import sys
+import binascii
 
 def derive_key(password, salt, length=32):
     kdf = PBKDF2HMAC(
@@ -17,56 +18,82 @@ def derive_key(password, salt, length=32):
     return kdf.derive(password.encode())
 
 def encrypt_file(file_path, password):
-    salt = os.urandom(16)
-    key = derive_key(password, salt)
+    try:
+        stdin_flag = file_path.name == '<stdin>'
+        if not stdin_flag:
+            file_path = file_path.name
+        # salt = os.urandom(16)
+        salt = "some_salt_string".encode('utf-8')
+        key = derive_key(password, salt)
 
-    with open(file_path, 'rb') as file:
-        plaintext = file.read()
+        if stdin_flag:
+            plaintext = b"{sys.stdin.read()}"
+        else:
+            with open(file_path, 'rb') as file:
+                plaintext = file.read()
 
-    cipher = Cipher(algorithms.AES(key), modes.CFB(salt), backend=default_backend())
-    encryptor = cipher.encryptor()
-    ciphertext = encryptor.update(plaintext) + encryptor.finalize()
+        cipher = Cipher(algorithms.AES(key), modes.CFB(salt), backend=default_backend())
+        encryptor = cipher.encryptor()
+        ciphertext = encryptor.update(plaintext) + encryptor.finalize()
 
-    with open(file_path , 'wb') as file:
-        file.write(salt + ciphertext)
-    
+        if not stdin_flag:        
+            with open(file_path+'.enc' , 'wb') as file:
+                file.write(salt + ciphertext)
+        print(salt + ciphertext)
+    except Exception as e:
+        print("Error:",e)
+        sys.exit(1)
 
+        
 def decrypt_file(file_path, password):
-    with open(file_path, 'rb') as file:
-        data = file.read()
+    try:
+        stdin_flag = file_path.name == '<stdin>'
+        if not stdin_flag:
+            file_path = file_path.name
 
-    salt = data[:16]
-    ciphertext = data[16:]
 
-    key = derive_key(password, salt)
+        if stdin_flag:
+            data = b"{sys.stdin.read()}"
+        else:
+            with open(file_path+'.enc', 'rb') as file:
+                data = file.read()
+        ciphertext = data[16:]
+        salt = data[:16]
 
-    cipher = Cipher(algorithms.AES(key), modes.CFB(salt), backend=default_backend())
-    decryptor = cipher.decryptor()
-    plaintext = decryptor.update(ciphertext) + decryptor.finalize()
+        key = derive_key(password, salt)
 
-    with open(file_path, 'wb') as file:
-        file.write(plaintext)
+        cipher = Cipher(algorithms.AES(key), modes.CFB(salt), backend=default_backend())
+        decryptor = cipher.decryptor()
+        plaintext = decryptor.update(ciphertext) + decryptor.finalize()
 
+        if not stdin_flag:
+            with open(file_path+'.dec', 'wb') as file:
+                file.write(plaintext)
+        print(plaintext)
+    except Exception as e:
+        print("Error:",e)
+        sys.exit(1)
 def main():
     parser = argparse.ArgumentParser(description="Encrypt or decrypt a file using a password.")
-    parser.add_argument("file_path", type=str, default=sys.stdin, help="Path to the file to be encrypted or decrypted.")
-    parser.add_argument("password", type=str, help="Password for encryption or decryption.")
+    parser.add_argument("file_path", nargs='?', type=argparse.FileType("r"), default=sys.stdin, help="Path to the file to be encrypted or decrypted.")
+    # parser.add_argument("password", nargs=1,type=str,default="pword", help="Password for encryption or decryption.")
     parser.add_argument("-e", "--encrypt",  action="store_true", help="Encrypt the file.")
     parser.add_argument("-d", "--decrypt", action="store_true", help="Decrypt the file.")
 
 
     args = parser.parse_args()
+    password = 'password'
 
-    print(args._get_args)
 
     if args.encrypt:
-        encrypt_file(args.file_path, args.password)
-        print("File encrypted successfully.")
+        encrypt_file(args.file_path, password)
+        # print("File encrypted successfully.")
     elif args.decrypt:
-        decrypt_file(args.file_path, args.password)
-        print("File decrypted successfully.")
+        decrypt_file(args.file_path, password)
+        # print("File decrypted successfully.")
     else:
-        print("Please specify either --encrypt or --decrypt.")
+        sys.stderr.write(f"Please specify either --encrypt or --decrypt.")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()

@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 import os
 
-def count_wc(file):
+def wc(file):
     lines = 0
     words = 0
     characters = 0
@@ -27,12 +27,12 @@ def main():
     args = parser.parse_args()
 
     try:
-        lines, words, characters = count_wc(args.input_file)
+        lines, words, characters = wc(args.input_file)
         file_name = args.input_file.name
         if os.name == 'nt':
             file_name = Path(args.input_file.name).as_posix()
             
-        if not args.chars and not args.words and not args.chars:
+        if not args.chars and not args.words and not args.lines:
             args.chars = True
             args.words = True
             args.lines = True
