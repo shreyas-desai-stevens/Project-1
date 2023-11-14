@@ -15,7 +15,7 @@ def run_test(program, input_file, run_type, flags):
     expected_error_path = os.path.join(test_directory, input_file.replace(".in", ".err"))
 
     try:
-        print(f"File   : {input_path}")
+        print(f"File    : {input_path}")
 
         if run_type == "stdin":
             cmd = f"python prog/{program} {flags} < {input_path}"
@@ -23,10 +23,10 @@ def run_test(program, input_file, run_type, flags):
             cmd = f"python prog/{program} {Path(input_path).as_posix()} {flags}"
 
         result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, text=True)
-        print(result.args)
+        print("COMMAND :",result.args)
         # print(result.stderr)
         if result.stderr:
-            print("Output:",expected_error_path)
+            print("Output  :",expected_error_path)
             try:
                 with open(expected_error_path, "r") as expected_error:
                     expected_result = expected_error.read()   
