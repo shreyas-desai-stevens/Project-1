@@ -3,27 +3,23 @@ name: Run Tests
 on: [push]
 
 jobs:
-  env-setup:
+  test:
     runs-on: ubuntu-latest
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
       with:
         ref: ${{ github.event.pull_request.head.sha }}
 
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: 3.x 
 
-  install-dependencies:
-    runs-on: ubuntu-latest
-    steps:
     - name: Install dependencies
       run: pip install -r requirements.txt
-
-  run-tests:
-    runs-on: ubuntu-latest
-    steps:
+  
     - name: Run tests
       run: python test.py
