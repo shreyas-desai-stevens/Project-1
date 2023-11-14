@@ -16,7 +16,6 @@ def run_test(program, input_file, run_type, flags):
 
     try:
         print(f"File   : {input_path}")
-        print(f"Output : {expected_output_path}")
 
         if run_type == "stdin":
             cmd = f"python prog/{program} {flags} < {input_path}"
@@ -24,19 +23,22 @@ def run_test(program, input_file, run_type, flags):
             cmd = f"python prog/{program} {Path(input_path).as_posix()} {flags}"
 
         result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, text=True)
-        print(result)
+        print(result.args)
+        # print(result.stderr)
         if result.stderr:
+            print("Output:",expected_error_path)
             try:
                 with open(expected_error_path, "r") as expected_error:
                     expected_result = expected_error.read()   
                     if result.stderr == expected_result:
                         return "PASS", None, 0, expected_result
                     else:
-                        return "FAIL", f"Output Mismatch!\nGot:\n{result.stdout}", 1, expected_result
+                        return "FAIL", f"Output Mismatch!\nGot:\n{result.stderr}", 1, expected_result
             except FileNotFoundError:
                 return "FAIL", f"File not found!\n{expected_error_path}", 1, ''
 
-        if result.stdout and not result.stderr:        
+        if result.stdout and not result.stderr:  
+            print("OUTPUT:",expected_output_path)      
             try:
                 with open(expected_output_path, "r") as expected_output:
                     expected_result = expected_output.read()
@@ -78,12 +80,6 @@ def main():
             for i in additional_flags:
                 status, error_message, exit_code, expected_result = run_test(program, test_file, run_type, i)
                 total += 1
-                # if program=='wc.py':
-                #     errors["WC_Tests"]+=1
-                # if program=='gron.py':
-                #     errors["GRON_Tests"]+=1
-                # if program=='cipher.py':
-                #     errors["CIPHER_Tests"]+=1
                 if exit_code > 0:
                     errors['FAILED'] += 1
                 else:

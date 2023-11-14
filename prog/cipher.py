@@ -26,11 +26,12 @@ def encrypt_file(file_path, password):
         salt = "some_salt_string".encode('utf-8')
         key = derive_key(password, salt)
 
-        if stdin_flag:
-            plaintext = b"{sys.stdin.read()}"
+        if stdin_flag:            
+            plaintext  = sys.stdin.read().strip().encode('utf-8')
         else:
             with open(file_path, 'rb') as file:
                 plaintext = file.read()
+        # print("plaintext",plaintext)
 
         cipher = Cipher(algorithms.AES(key), modes.CFB(salt), backend=default_backend())
         encryptor = cipher.encryptor()
@@ -41,7 +42,7 @@ def encrypt_file(file_path, password):
                 file.write(salt + ciphertext)
         print(salt + ciphertext)
     except Exception as e:
-        print("Error:",e)
+        sys.stderr.write(f"{e}")
         sys.exit(1)
 
         
@@ -51,14 +52,16 @@ def decrypt_file(file_path, password):
         if not stdin_flag:
             file_path = file_path.name
 
-
         if stdin_flag:
-            data = b"{sys.stdin.read()}"
+            data = sys.stdin.read().encode('utf-8')
         else:
             with open(file_path+'.enc', 'rb') as file:
                 data = file.read()
         ciphertext = data[16:]
-        salt = data[:16]
+        if data:        
+            salt = data[:16]
+        else:
+            salt="some_salt_string".encode('utf-8')
 
         key = derive_key(password, salt)
 
@@ -71,7 +74,7 @@ def decrypt_file(file_path, password):
                 file.write(plaintext)
         print(plaintext)
     except Exception as e:
-        print("Error:",e)
+        sys.stderr.write(f"{e}")
         sys.exit(1)
 def main():
     parser = argparse.ArgumentParser(description="Encrypt or decrypt a file using a password.")
