@@ -3,7 +3,7 @@ name: Run Tests
 on: [push]
 
 jobs:
-  test:
+  env-setup:
     runs-on: ubuntu-latest
 
     steps:
@@ -12,14 +12,17 @@ jobs:
       with:
         ref: ${{ github.event.pull_request.head.sha }}
 
-
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: 3.x 
 
+  install-dependencies:
+    steps:
     - name: Install dependencies
       run: pip install -r requirements.txt
-  
+
+  run-tests:
+    steps:
     - name: Run tests
       run: python test.py
