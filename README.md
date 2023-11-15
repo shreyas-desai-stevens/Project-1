@@ -1,13 +1,15 @@
-#wc.py
-##Word Count Utility
+# wc.py
+## Word Count Utility
+
 This Python script, wc.py, is a simple utility for counting characters, words, and lines in a file or from standard input. It provides a command-line interface with options to display counts for characters, words, and lines.
 
-###Usage
+### Usage
 ```
 wc.py [options] [input_file]
 ```
 
-Options
+Options </br>
+
 input_file: File to read input from (default is stdin).
 
 -w, --words: Display word(s) count.
