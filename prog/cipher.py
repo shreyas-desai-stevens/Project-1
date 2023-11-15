@@ -5,7 +5,7 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 import os
 import sys
-import binascii
+
 
 def derive_key(password, salt, length=32):
     kdf = PBKDF2HMAC(
@@ -76,6 +76,7 @@ def decrypt_file(file_path, password):
     except Exception as e:
         sys.stderr.write(f"{e}")
         sys.exit(1)
+
 def main():
     parser = argparse.ArgumentParser(description="Encrypt or decrypt a file using a password.")
     parser.add_argument("file_path", nargs='?', type=argparse.FileType("r"), default=sys.stdin, help="Path to the file to be encrypted or decrypted.")
@@ -83,10 +84,8 @@ def main():
     parser.add_argument("-e", "--encrypt",  action="store_true", help="Encrypt the file.")
     parser.add_argument("-d", "--decrypt", action="store_true", help="Decrypt the file.")
 
-
     args = parser.parse_args()
     password = 'password'
-
 
     if args.encrypt:
         encrypt_file(args.file_path, password)
