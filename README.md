@@ -7,7 +7,7 @@
 ### Test Harness File Description - test.py
 
 in the `test.py` file, we have the `run_test()` method
-```
+```python
 run_test(program, input_file, run_type, flags)
 ```
 The method takes in `program`, which is the program on which the current tests are being run on.</br> `input_file`, the test file on which the program is being tested on. </br>`run_type`, i.e. whether the input from the `input_file` is being passed as *CLI* argument or through *STDIN* and finally </br>`flags`, which takes in the flags associated with the command.</br>
