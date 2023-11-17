@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# !/usr/bin/env python
 import argparse
 import sys
 from pathlib import Path
@@ -8,7 +8,6 @@ def wc(file):
     lines = 0
     words = 0
     characters = 0
-
     for line in file:
         lines += 1
         words += len(line.split())
